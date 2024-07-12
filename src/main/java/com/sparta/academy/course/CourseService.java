@@ -5,6 +5,8 @@ import com.sparta.academy.course.dto.CourseResponseDto;
 import com.sparta.academy.instructor.Instructor;
 import com.sparta.academy.instructor.InstructorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,11 @@ public class CourseService {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found"));
 
+        // 매니저 권한을 가진 사용자만 업데이트 가능하도록 검사
+        if (!currentUserHasRole("ROLE_MANAGER")) {
+            throw new AccessDeniedException("Course update is allowed only for managers.");
+        }
+
         course.update(requestDto);
 
         return new CourseResponseDto(course);
@@ -65,5 +72,12 @@ public class CourseService {
                 .orElseThrow(() -> new IllegalArgumentException("Instructor not found"));
         List<Course> courses = courseRepository.findByInstructor(instructor);
         return courses.stream().map(CourseResponseDto::new).collect(Collectors.toList());
+    }
+
+    // 현재 사용자가 특정 역할을 가지고 있는지 확인하는 메소드
+    private boolean currentUserHasRole(String role) {
+
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals(role));
     }
 }
