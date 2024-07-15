@@ -32,7 +32,7 @@ public class JwtUtil {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    private final long TOKEN_TIME = 60 * 60 * 1000L; // 60분
+    private final long TOKEN_TIME = 86400000L; // 1일
 
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
     private String secretKey;
@@ -40,7 +40,8 @@ public class JwtUtil {
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     // 로그 설정
-    public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
+    public static final Logger
+            logger = LoggerFactory.getLogger("JWT 관련 로그");
 
 
     // secretKey를 Decoding해서 key에 담는다.
@@ -52,15 +53,15 @@ public class JwtUtil {
 
 
     // JWT(토큰) 생성
-    public String createToken(String username, UserRoleEnum role) {
-        Date date = new Date();
+    public String createToken(String email, UserRoleEnum role) {
+        Date now = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(username) // 사용자 식별자값(ID)
+                        .setSubject(email) // 사용자 식별자값(ID)
                         .claim(AUTHORIZATION_KEY, role) // 사용자 권한
-                        .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
-                        .setIssuedAt(date) // 발급일
+                        .setIssuedAt(now) // 발급일
+                        .setExpiration(new Date(now.getTime() + TOKEN_TIME)) // 만료 시간
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘 *****
                         .compact();
     }
@@ -83,7 +84,7 @@ public class JwtUtil {
     // Cookie에 들어있던 JWT 토큰 substring
     public String substringToken(String tokenValue) {
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
-            return tokenValue.substring(7); //"BEARER " 한칸 띄운 것까지 7자이기 때문에 7
+            return tokenValue.substring(BEARER_PREFIX.length());
         }
         logger.error("Not Found Token");
         throw new NullPointerException("Not Found Token");

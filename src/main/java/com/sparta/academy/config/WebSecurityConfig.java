@@ -1,9 +1,11 @@
 package com.sparta.academy.config;
 
+import com.sparta.academy.admin.AdminRepository;
 import com.sparta.academy.jwt.JwtAuthenticationFilter;
 import com.sparta.academy.jwt.JwtAuthorizationFilter;
 import com.sparta.academy.jwt.JwtUtil;
 import com.sparta.academy.security.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity // Spring Security 지원을 가능하게 함
 @EnableGlobalMethodSecurity(securedEnabled = true) // @Secured 애너테이션 활성화
 public class WebSecurityConfig {
@@ -25,20 +28,11 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration) {
-        this.jwtUtil = jwtUtil;
-        this.userDetailsService = userDetailsService;
-        this.authenticationConfiguration = authenticationConfiguration;
-    }
+
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AdminRepository adminRepository) throws Exception {
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, adminRepository);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
@@ -49,41 +43,31 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                // CSRF 설정
-                .csrf(csrf -> csrf.disable())
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
-                // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
 
-                // 접근 권한 설정
-                .authorizeHttpRequests(authorizeHttpRequests ->
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AdminRepository adminRepository) throws Exception {
+        // CSRF 설정
+        http.csrf((csrf) -> csrf.disable());
+
+        http.sessionManagement((sessionManagement) ->
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+        http.authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-                                .requestMatchers("/api/user/**").permitAll() // '/api/user/'로 시작하는 요청 모두 접근 허가
+                                .requestMatchers("/api/admin/signup", "/api/admin/login").permitAll()
                                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리
                 )
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, adminRepository), UsernamePasswordAuthenticationFilter.class);
 
-                // 폼 로그인 설정
-                .formLogin(formLogin ->
-                        formLogin
-                                .loginPage("/api/user/login-page").permitAll()
-                )
+        // 로그인 사용
+//        http.formLogin(Customizer.withDefaults());
 
-                // 필터 관리
-                .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-
-                //접근 불가 페이지
-                .exceptionHandling((exceptionHandling) ->
-                        exceptionHandling
-                                // "접근 불가" 페이지 URL 설정
-                                .accessDeniedPage("/forbidden.html")
-                )
-
-                .build();
+        return http.build();
     }
 }

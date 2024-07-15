@@ -3,8 +3,10 @@ package com.sparta.academy.admin;
 import com.sparta.academy.enums.DepartmentEnum;
 import com.sparta.academy.enums.UserRoleEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 
 @Entity
 @Getter
@@ -16,6 +18,7 @@ public class Admin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Email
     @Column(nullable = false, unique = true)
     private String email;
 
