@@ -1,16 +1,10 @@
 package com.sparta.academy.admin;
 
 import com.sparta.academy.admin.dto.AdminResponseDto;
-import com.sparta.academy.admin.dto.LoginRequestDto;
 import com.sparta.academy.admin.dto.SignupRequestDto;
 import com.sparta.academy.enums.DepartmentEnum;
 import com.sparta.academy.enums.UserRoleEnum;
-import com.sparta.academy.jwt.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +17,7 @@ public class AdminService {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+
 
     @Transactional
     public AdminResponseDto createAdmin(SignupRequestDto requestDto) {

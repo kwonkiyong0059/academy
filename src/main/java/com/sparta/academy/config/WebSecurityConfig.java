@@ -1,13 +1,11 @@
 package com.sparta.academy.config;
 
-import com.sparta.academy.admin.AdminRepository;
 import com.sparta.academy.enums.UserRoleEnum;
 import com.sparta.academy.jwt.JwtAuthenticationFilter;
 import com.sparta.academy.jwt.JwtAuthorizationFilter;
 import com.sparta.academy.jwt.JwtUtil;
 import com.sparta.academy.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.Manager;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +31,13 @@ public class WebSecurityConfig {
 
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(AdminRepository adminRepository) throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, adminRepository);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
@@ -44,14 +47,9 @@ public class WebSecurityConfig {
         return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AdminRepository adminRepository) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // CSRF 설정
         http.csrf((csrf) -> csrf.disable());
 
@@ -66,7 +64,8 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/instructors/{id}", "/api/course/{id}").hasRole(UserRoleEnum.MANAGER.name())
                                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, adminRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         // 로그인 사용
 //        http.formLogin(Customizer.withDefaults());

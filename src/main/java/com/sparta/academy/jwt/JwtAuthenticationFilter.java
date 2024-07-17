@@ -1,7 +1,6 @@
 package com.sparta.academy.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.academy.admin.AdminRepository;
 import com.sparta.academy.admin.dto.LoginRequestDto;
 import com.sparta.academy.enums.UserRoleEnum;
 import com.sparta.academy.security.UserDetailsImpl;
@@ -20,12 +19,9 @@ import java.io.IOException;
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtil jwtUtil;
-    private final AdminRepository adminRepository;
 
-
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, AdminRepository adminRepository) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        this.adminRepository = adminRepository;
         setFilterProcessesUrl("/api/admin/login");
     }
 
