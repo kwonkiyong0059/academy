@@ -60,7 +60,7 @@ public class WebSecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
                                 .requestMatchers("/api/admin/signup", "/api/admin/login").permitAll()
-                                .requestMatchers("/api/instructors/{id}", "/api/course/{id}").hasRole(UserRoleEnum.MANAGER.name())
+//                                .requestMatchers("/api/instructors/{id}", "/api/course/{id}").hasRole(UserRoleEnum.MANAGER.name())
                                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리
                 )
                 .addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class)

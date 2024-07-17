@@ -2,6 +2,7 @@ package com.sparta.academy.course;
 
 import com.sparta.academy.course.dto.CourseRequestDto;
 import com.sparta.academy.course.dto.CourseResponseDto;
+import com.sparta.academy.enums.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -22,7 +23,7 @@ public class CourseController {
         return ResponseEntity.ok(responseDto);
     }
 
-
+    @Secured(UserRoleEnum.Authority.MANAGER)
     @PutMapping("/{id}")
     public ResponseEntity<CourseResponseDto> updateCourse(@PathVariable long id, @RequestBody CourseRequestDto requestDto) {
         CourseResponseDto responseDto = courseService.updateCourse(id, requestDto);

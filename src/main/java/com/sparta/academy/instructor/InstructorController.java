@@ -1,5 +1,6 @@
 package com.sparta.academy.instructor;
 
+import com.sparta.academy.enums.UserRoleEnum;
 import com.sparta.academy.exception.ForbiddenException;
 import com.sparta.academy.instructor.dto.InstructorRequestDto;
 import com.sparta.academy.instructor.dto.InstructorResponseDto;
@@ -22,6 +23,7 @@ public class InstructorController {
     }
 
 
+    @Secured(UserRoleEnum.Authority.MANAGER)
     @PutMapping("/{id}")
     public ResponseEntity<InstructorResponseDto> updateInstructor(@PathVariable Long id, @RequestBody InstructorRequestDto requestDto) {
         InstructorResponseDto responseDto = instructorService.updateInstructor(id, requestDto);
