@@ -26,6 +26,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(JwtUtil jwtUtil, AdminRepository adminRepository) {
         this.jwtUtil = jwtUtil;
         this.adminRepository = adminRepository;
+        setFilterProcessesUrl("/api/admin/login");
     }
 
     @Override

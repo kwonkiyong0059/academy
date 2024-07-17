@@ -1,8 +1,14 @@
 package com.sparta.academy.instructor;
 
+import com.sparta.academy.course.Course;
+import com.sparta.academy.instructor.dto.InstructorRequestDto;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,7 +24,7 @@ public class Instructor {
     private String name;
 
     @Column(nullable = false)
-    private int experienceYears;
+    private Integer  experienceYears;
 
     @Column(nullable = false)
     private String company;
@@ -29,7 +35,15 @@ public class Instructor {
     @Column(nullable = false)
     private String introduction;
 
-    public Instructor(String name, int experienceYears, String company, String phoneNumber, String introduction) {
+    @OneToMany(mappedBy = "instructor")
+    private List<Course> courseList = new ArrayList<>();
+
+    public void addCourse(Course course) {
+        this.courseList.add(course);
+    }
+
+    @Builder
+    public Instructor(String name, Integer experienceYears, String company, String phoneNumber, String introduction) {
         this.name = name;
         this.experienceYears = experienceYears;
         this.company = company;
@@ -37,10 +51,18 @@ public class Instructor {
         this.introduction = introduction;
     }
 
-    public void update(String company, int experienceYears, String phoneNumber, String introduction) {
-        this.company = company;
-        this.experienceYears = experienceYears;
-        this.phoneNumber = phoneNumber;
-        this.introduction = introduction;
+    public void update(InstructorRequestDto requestDto) {
+        if(requestDto.getExperienceYears() != null){
+            this.experienceYears = requestDto.getExperienceYears();
+        }
+        if(requestDto.getCompany() != null){
+            this.company = requestDto.getCompany();
+        }
+        if(requestDto.getPhoneNumber() != null){
+            this.phoneNumber = requestDto.getPhoneNumber();
+        }
+        if(requestDto.getIntroduction() != null){
+            this.introduction = requestDto.getIntroduction();
+        }
     }
 }

@@ -1,11 +1,13 @@
 package com.sparta.academy.config;
 
 import com.sparta.academy.admin.AdminRepository;
+import com.sparta.academy.enums.UserRoleEnum;
 import com.sparta.academy.jwt.JwtAuthenticationFilter;
 import com.sparta.academy.jwt.JwtAuthorizationFilter;
 import com.sparta.academy.jwt.JwtUtil;
 import com.sparta.academy.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.Manager;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,6 +63,7 @@ public class WebSecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
                                 .requestMatchers("/api/admin/signup", "/api/admin/login").permitAll()
+                                .requestMatchers("/api/instructors/{id}", "/api/course/{id}").hasRole(UserRoleEnum.MANAGER.name())
                                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, adminRepository), UsernamePasswordAuthenticationFilter.class);

@@ -12,6 +12,7 @@ import java.util.Collection;
 
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
+
     private final Admin admin;
 
     public Admin getUser() {

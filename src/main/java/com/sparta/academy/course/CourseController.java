@@ -22,7 +22,7 @@ public class CourseController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Secured("ROLE_MANAGER") // 매니저 권한만 수정 가능
+
     @PutMapping("/{id}")
     public ResponseEntity<CourseResponseDto> updateCourse(@PathVariable long id, @RequestBody CourseRequestDto requestDto) {
         CourseResponseDto responseDto = courseService.updateCourse(id, requestDto);
@@ -38,6 +38,7 @@ public class CourseController {
     @GetMapping
     public ResponseEntity<List<CourseResponseDto>> getCourseByCategory(@RequestParam String category) {
         return ResponseEntity.ok().body(courseService.findByCategory(category));
+
     }
 
     @GetMapping("/instructor/{instructorId}")

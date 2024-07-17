@@ -40,6 +40,7 @@ public class Course {
     private Instructor instructor;
 
     @CreatedDate
+    @Temporal(TemporalType.DATE)
     @Column(name="registered_at", updatable = false)
     private LocalDate registeredAt;
 

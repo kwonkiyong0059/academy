@@ -21,7 +21,7 @@ public class InstructorController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Secured("ROLE_MANAGER") // 매니저 권한만 업데이트 가능
+
     @PutMapping("/{id}")
     public ResponseEntity<InstructorResponseDto> updateInstructor(@PathVariable Long id, @RequestBody InstructorRequestDto requestDto) {
         InstructorResponseDto responseDto = instructorService.updateInstructor(id, requestDto);

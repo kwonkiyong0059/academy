@@ -20,10 +20,15 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final InstructorRepository instructorRepository;
 
+
+
     @Transactional
     public CourseResponseDto createCourse(CourseRequestDto requestDto) {
+
         Instructor instructor = instructorRepository.findById(requestDto.getInstructorId())
-                .orElseThrow(() -> new IllegalArgumentException("Instructor not found"));
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Instructor not found")
+                );
 
         Course course = Course.builder()
                 .title(requestDto.getTitle())
@@ -33,20 +38,16 @@ public class CourseService {
                 .instructor(instructor)
                 .build();
 
+        instructor.addCourse(course);
         courseRepository.save(course);
-
         return new CourseResponseDto(course);
+
     }
 
     @Transactional
     public CourseResponseDto updateCourse(long id, CourseRequestDto requestDto) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found"));
-
-        // 매니저 권한을 가진 사용자만 업데이트 가능하도록 검사
-        if (!currentUserHasRole("ROLE_MANAGER")) {
-            throw new AccessDeniedException("Course update is allowed only for managers.");
-        }
 
         course.update(requestDto);
 
@@ -56,14 +57,16 @@ public class CourseService {
     @Transactional(readOnly = true)
     public CourseResponseDto getCourse(long id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Course not found"));
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Course not found"));
         return new CourseResponseDto(course);
     }
 
     @Transactional(readOnly = true)
     public List<CourseResponseDto> findByCategory(String category) {
-        List<Course> courses = courseRepository.findByCategory(CourseCategoryEnum.valueOf(category));
-        return courses.stream().map(CourseResponseDto::new).collect(Collectors.toList());
+        CourseCategoryEnum categoryEnum = CourseCategoryEnum.valueOf(category);
+        List<Course> courses = courseRepository.findByCategoryOrderByRegisteredAtDesc(categoryEnum);
+        return courses.stream().map(CourseResponseDto::new).toList();
     }
 
     @Transactional(readOnly = true)

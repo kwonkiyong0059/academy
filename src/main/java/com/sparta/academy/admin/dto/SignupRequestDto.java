@@ -6,10 +6,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
-import lombok.Setter;
+
 
 @Getter
-@Setter
 public class SignupRequestDto {
 
     @Email(message = "올바른 이메일 형식이어야 합니다.")
@@ -24,8 +23,8 @@ public class SignupRequestDto {
     private String password;
 
     @NotNull(message = "부서는 필수 항목입니다.")
-    private DepartmentEnum department;
+    private String department;
 
     @NotNull(message = "권한은 필수 항목입니다.")
-    private UserRoleEnum role;
+    private Boolean isManager = false;
 }

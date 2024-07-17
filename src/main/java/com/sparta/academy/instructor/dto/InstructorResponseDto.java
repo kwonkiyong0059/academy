@@ -7,7 +7,7 @@ import lombok.Getter;
 public class InstructorResponseDto {
     private Long id;
     private String name;
-    private int experienceYears;
+    private Integer experienceYears;
     private String company;
     private String phoneNumber;
     private String introduction;

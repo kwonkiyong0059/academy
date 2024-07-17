@@ -29,8 +29,4 @@ public class AdminController {
         return ResponseEntity.ok(responseBody);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDto loginRequestDto, HttpServletResponse response) {
-        return adminService.login(loginRequestDto, response);
-    }
 }

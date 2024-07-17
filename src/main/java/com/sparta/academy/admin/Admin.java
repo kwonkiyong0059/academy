@@ -4,6 +4,7 @@ import com.sparta.academy.enums.DepartmentEnum;
 import com.sparta.academy.enums.UserRoleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,6 +34,7 @@ public class Admin {
     @Column(nullable = false)
     private UserRoleEnum role;
 
+    @Builder
     public Admin(String email, String password, DepartmentEnum department, UserRoleEnum role) {
         this.email = email;
         this.password = password;
