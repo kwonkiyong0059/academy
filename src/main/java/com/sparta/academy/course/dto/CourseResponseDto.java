@@ -13,7 +13,7 @@ public class CourseResponseDto {
     private Integer price;
     private String description;
     private CourseCategoryEnum category;
-    private Instructor instructor;
+    private Long instructorId;
     private LocalDate registrationDate; // Changed to LocalDate to match Course class
 
     public CourseResponseDto(Course course) {
@@ -21,7 +21,7 @@ public class CourseResponseDto {
         this.price = course.getPrice();
         this.description = course.getDescription();
         this.category = course.getCategory();
-        this.instructor = course.getInstructor();
+        this.instructorId = course.getInstructor().getId();
         this.registrationDate = course.getRegisteredAt(); // Correct method call
     }
 }
